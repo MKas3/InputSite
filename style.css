@@ -1,0 +1,17 @@
+body {
+    background-color: #222022;
+    text-align: center;
+    color: #ffffff;
+}
+
+.ul-input {
+    width: 50%;
+    margin: auto;
+}
+
+.main-ul ul {
+    list-style-position: inside;
+    text-align: left;
+    width: 50%;
+    margin: auto;
+}
