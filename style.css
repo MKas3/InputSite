@@ -2,16 +2,36 @@ body {
     background-color: #222022;
     text-align: center;
     color: #ffffff;
+    min-width: 30em;
+}
+
+li {
+    padding-bottom: 0.25em;
 }
 
 .ul-input {
     width: 50%;
     margin: auto;
+    display: flex;
+    justify-content: center;
 }
 
 .main-ul ul {
-    list-style-position: inside;
     text-align: left;
     width: 50%;
     margin: auto;
+    word-wrap: break-word;
+}
+
+.btn-sm {
+    float: right;
+    font-size: xx-small;
+    margin-right: 0.5em;
+}
+
+.rename-field {
+    background-color: #222022;
+    color: #ffffff;
+    width: 50%;
+    height: 1.5em;
 }

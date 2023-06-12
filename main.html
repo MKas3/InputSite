@@ -9,21 +9,17 @@
         <title>Input site</title>
     </head>
     <body>
-        <p>
-            <div class="input-group mb-3 ul-input">
-                <input type="text" class="form-control" placeholder="Enter a list item">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="button">Add</button>
-                </div>
-            </div>
-        </p>
+        <form class="input-group mb-3 ul-input">
+            <input type="text" class="form-control" placeholder="Enter a list item">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
 
-        <p>
-            <div class="main-ul">
-                <h1>Items list</h1>
+        <div class="main-ul">
+            <h1>Items list</h1>
+            <form>
                 <ul></ul>
-            </div>
-        </p>
+            </form>
+        </div>
 
         <script src="main.js"></script>
     </body>
