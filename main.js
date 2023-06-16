@@ -24,7 +24,13 @@ document.addEventListener("click", function(e) {
     const target = e.target.closest(".del-button");
     if (target) {
         const li = target.closest("li");
-        innerOrderedList.splice(innerOrderedList.indexOf(li), 1);
+        const liIndex = innerOrderedList.indexOf(li);
+        for (var i = liIndex; i < innerOrderedList.length; i++)
+            innerOrderedList[i].setAttribute(
+                "data-id", 
+                innerOrderedList[i].getAttribute("data-id") - 1);
+        innerOrderedList.splice(liIndex, 1);
+        innerAlphOrderedList = innerAlphOrderedList.filter(x => x != li);
         li.remove();
     };
 });
