@@ -9,18 +9,42 @@ li {
     padding-bottom: 0.25em;
 }
 
-.ul-input {
+li:hover {
+    color: #8a8a8a;
+}
+
+li label,
+li input {
+    background-color: #222022;
+    color: #ffffff;
+    width: 50%;
+    line-height: 1.5em;
+    word-wrap: break-word;
+    display: inline-block;
+}
+
+.ol-input {
     width: 50%;
     margin: auto;
     display: flex;
     justify-content: center;
 }
 
-.main-ul ul {
+.main-ol {
+    margin-top: 5%;
+}
+
+.main-ol ol li::before {
+    content: attr(data-id)". ";
+    display: inline;
+}
+
+.main-ol ol {
     text-align: left;
     width: 50%;
     margin: auto;
     word-wrap: break-word;
+    list-style: none;
 }
 
 .btn-sm {
@@ -29,9 +53,7 @@ li {
     margin-right: 0.5em;
 }
 
-.rename-field {
-    background-color: #222022;
-    color: #ffffff;
+.form-check {
     width: 50%;
-    height: 1.5em;
+    margin: auto;
 }

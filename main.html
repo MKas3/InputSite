@@ -9,15 +9,40 @@
         <title>Input site</title>
     </head>
     <body>
-        <form class="input-group mb-3 ul-input">
+        <form class="input-group mb-3 ol-input">
             <input type="text" class="form-control" placeholder="Enter a list item">
             <button type="submit" class="btn btn-primary">Add</button>
         </form>
 
-        <div class="main-ul">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault" checked>
+            <label class="form-check-label" for="flexRadioDefault1">
+                Ascending numbers
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault">
+            <label class="form-check-label" for="flexRadioDefault2">
+                Descending numbers
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault">
+            <label class="form-check-label" for="flexRadioDefault2">
+                In alphabetical order
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="flexRadioDefault">
+            <label class="form-check-label" for="flexRadioDefault2">
+                In reverse alphabetical order
+            </label>
+        </div>
+
+        <div class="main-ol">
             <h1>Items list</h1>
             <form>
-                <ul></ul>
+                <ol></ol>
             </form>
         </div>
 

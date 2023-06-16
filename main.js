@@ -1,110 +1,196 @@
-let ulInput = document.querySelector(".ul-input");
-let input = ulInput.querySelector("input");
-let addButton = ulInput.querySelector(".btn");
+let olInput = document.querySelector(".ol-input");
+let input = olInput.querySelector("input");
+let addButton = olInput.querySelector(".btn");
 
-let ul = document.querySelector(".main-ul ul");
+let ol = document.querySelector(".main-ol ol");
 
-let isItemCaptured = false;
+let radioButtons = document.querySelectorAll(".form-check-input");
 
+let innerOrderedList = [];
+let innerAlphOrderedList = [];
 
-ulInput.addEventListener("submit", processSubmit);
+let tempText = "";
 
+let capturedId = -1;
+let id = 1;
+let sortingIndexNow = 0;
+
+olInput.addEventListener("submit", processSubmit);
+
+for (let i = 0; i < radioButtons.length; i++)
+    radioButtons[i].addEventListener("click", () => processSortingChange(i));
+
+document.addEventListener("click", function(e) {
+    const target = e.target.closest(".del-button");
+    if (target) {
+        const li = target.closest("li");
+        innerOrderedList.splice(innerOrderedList.indexOf(li), 1);
+        li.remove();
+    };
+});
 
 function processSubmit(event) {
     event.preventDefault();
 
     if (checkItemValidity(input.value)) {
-        var newLi = document.createElement("li");
-
-        var textNode = document.createTextNode(input.value.trim());
-        newLi.appendChild(textNode);
-        
-        var editButton = createButton("Edit", "btn-outline-secondary");
-        editButton.onclick = () => processEditClick(textNode, editButton, deleteButton, newLi);
-
-        var deleteButton = createButton("X", "btn-outline-danger");
-        deleteButton.onclick = () => newLi.remove();
-
-        newLi.appendChild(deleteButton);
-        newLi.appendChild(editButton);
-
-        newLi.setAttribute("onmouseover", "this.style.color='#8a8a8a'");
-        newLi.setAttribute("onmouseout", "this.style.color='#ffffff'");
-
-        ul.appendChild(newLi);
-
+        pushToOrderedLists(addLiToOl(input.value, id));
         input.value = "";
-    }
-    else {
+        id++;
+    } else {
         alertInvalidName();
     };
 };
 
+function pushToOrderedLists(li)
+{
+    innerOrderedList.push(li);
+
+    innerAlphOrderedList.push(li);
+    sortAlphList();
+
+    updateList();
+}
+
+function sortAlphList() {
+    innerAlphOrderedList.sort((a, b) => a.innerText.localeCompare(b.innerText));
+}
+
+function addLiToOl(text, id) {
+    const newLi = createElement("li");
+    newLi.setAttribute("data-id", id);
+    
+    const label = createElement("label");
+    newLi.appendChild(label);
+    label.innerText = text.trim();
+
+    const editButton = createButtonWithListener(
+        id, "Edit", "btn-outline-secondary");
+
+    const deleteButton = createButton("X", "btn-outline-danger");
+    deleteButton.classList.add("del-button");
+
+    const acceptButton = createButtonWithListener(
+        id, "OK", "btn-outline-success", "none");
+
+    const cancelButton = createButtonWithListener(
+        id, "Cancel", "btn-outline-danger", "none");
+
+    const renameInput = createInput(text);
+
+    newLi.appendChild(deleteButton);
+    newLi.appendChild(editButton);
+    newLi.appendChild(acceptButton);
+    newLi.appendChild(cancelButton);
+    newLi.appendChild(renameInput);
+
+    ol.appendChild(newLi);
+
+    return newLi;
+};
+
 function alertInvalidName() {
     alert("Please enter a valid item (non-empty and not consisting of only spaces)");
-}
+};
 
 function checkItemValidity(name) {
-    var re = /[^ ]+/;
+    const re = /[^ ]+/;
     return re.test(name);
-}
+};
 
-function processEditClick(textNode, editButton, deleteButton, newLi) {
-    if (isItemCaptured) return;
+function processButtonClick(id, buttonName) {
+    if (capturedId != -1 && capturedId != id) return;
 
-    isItemCaptured = true;
+    const li = document.querySelector('[data-id="' + id + '"]');
     
-    var tempText = captudedTempText = textNode.textContent;
+    const editMode = li.classList.toggle("edit-mode");
+    capturedId = editMode ? id : -1;
 
-    var renameInput = createInput(tempText, "rename-field");
-        
-    var acceptButton = createButton("OK", "btn-outline-success", "submit");   
-    var cancelButton = createButton("Cancel", "btn-outline-danger");
+    const nonEditDisplay = editMode ? "none" : "inline-block";
+    const editDisplay = editMode ? "inline-block" : "none";
 
-    acceptButton.onclick = () => tryReplaceBack(renameInput.value);
-    cancelButton.onclick = () => tryReplaceBack(tempText);
+    const label = li.querySelector("label");
+    const input = li.querySelector("input");
+    label.style.display = nonEditDisplay;
+    input.style.display = editDisplay;
 
-    newLi.replaceChild(renameInput, textNode);
-    newLi.replaceChild(acceptButton, editButton);
-    newLi.replaceChild(cancelButton, deleteButton);
+    for (const button of li.querySelectorAll("button")) {
+        button.style.display = 
+            button.classList.contains("edit-mode-button") 
+            ? editDisplay 
+            : nonEditDisplay;
+    };
 
-    function tryReplaceBack(text) {
-
-        if (!checkItemValidity(text)) {
+    if (editMode) {
+        tempText = label.innerText;
+    } else if (buttonName == "OK" && checkItemValidity(input.value)) {
+        label.innerText = input.value;
+        sortAlphList();
+        updateList();
+    } else {
+        input.value = tempText; 
+        if (buttonName == "OK")
             alertInvalidName();
-            return;
-        };
-
-        textNode.textContent = text;
-
-        newLi.replaceChild(textNode, renameInput);
-        newLi.replaceChild(editButton, acceptButton);
-        newLi.replaceChild(deleteButton, cancelButton);
-
-        renameInput.remove();
-        acceptButton.remove();
-        cancelButton.remove();
-        isItemCaptured = false;
     };
 };
 
+function processSortingChange(sortingIndex) {
+    if (sortingIndexNow == sortingIndex) return;
+
+    sortingIndexNow = sortingIndex;
+
+    updateList();
+};
+
+function updateList() {
+    const listToSort = sortingIndexNow < 2 ? innerOrderedList : innerAlphOrderedList;
+
+    switch (sortingIndexNow) {
+        case 0:
+        case 2:
+            for (var i = listToSort.length - 1; i > 0; i--) {
+                ol.insertBefore(listToSort[i], listToSort[i+1]);
+            };
+            break;
+        case 1:
+        case 3:
+            for (var i = 0; i < listToSort.length - 1; i++) {
+                ol.insertBefore(listToSort[i+1], listToSort[i]);
+            };
+            break;
+        default:
+            break;
+    };
+};
+
+function createButtonWithListener(id, name, btnOption, display = "unset", type = "button") {
+    const button = createButton(name, btnOption, type);
+    button.addEventListener("click", () => processButtonClick(id, name));
+    button.style.display = display;
+
+    if (display == "none")
+        button.classList.add("edit-mode-button");
+
+    return button;
+};
+
 function createButton(name, btnOption, type = "button") {
-    var button = createElement("button", "btn", btnOption, "btn-sm");
+    const button = createElement("button", "btn", btnOption, "btn-sm");
     button.innerText = name;
     button.setAttribute("type", type);
 
     return button;
 };
 
-function createInput(text, inputOption) {
-    var input = createElement("input", inputOption);
+function createInput(text, display = "none", inputOption = null) {
+    const input = createElement("input", inputOption);
     input.value = text;
+    input.style.display = display;
 
     return input;
 };
 
 function createElement() {
-    var element = document.createElement(arguments[0]);
+    const element = document.createElement(arguments[0]);
     for (argument of arguments)
         element.classList.add(argument);
 
