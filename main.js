@@ -11,7 +11,7 @@ let innerAlphOrderedList = [];
 
 let tempText = "";
 
-let id = 1;
+let nextId = 1;
 let capturedId = -1;
 let sortingIndexNow = 0;
 
@@ -38,16 +38,16 @@ function deleteLiFromOl(li) {
     innerOrderedList.splice(liIndex, 1);
     innerAlphOrderedList = innerAlphOrderedList.filter((x) => x != li);
     li.remove();
-    id--;
+    nextId--;
 }
 
 function processSubmit(event) {
     event.preventDefault();
 
     if (checkItemValidity(input.value)) {
-        pushToOrderedLists(addLiToOl(input.value, id));
+        pushToOrderedLists(addLiToOl(input.value, nextId));
         input.value = "";
-        id++;
+        nextId++;
     } else {
         alertInvalidName();
     }
@@ -67,7 +67,12 @@ function sortAlphList() {
 }
 
 function addLiToOl(text, id) {
+	const newForm = createElement("form");
     const newLi = createElement("li");
+
+	newForm.appendChild(newLi);
+    ol.appendChild(newForm);
+
     newLi.setAttribute("data-id", id);
 
     const label = createElement("label");
@@ -87,7 +92,8 @@ function addLiToOl(text, id) {
         id,
         "OK",
         "btn-outline-success",
-        true
+        true,
+		"submit"
     );
 
     const cancelButton = createButtonWithListener(
@@ -96,8 +102,9 @@ function addLiToOl(text, id) {
         "btn-outline-danger",
         true
     );
-
+	
     const renameInput = createInput(text, true);
+	renameInput.addEventListener("submit", (event) => processButtonClick(event, id, "OK"));
 
     newLi.appendChild(deleteButton);
     newLi.appendChild(editButton);
@@ -105,9 +112,7 @@ function addLiToOl(text, id) {
     newLi.appendChild(cancelButton);
     newLi.appendChild(renameInput);
 
-    ol.appendChild(newLi);
-
-    return newLi;
+    return newForm;
 }
 
 function alertInvalidName() {
@@ -121,7 +126,9 @@ function checkItemValidity(name) {
     return re.test(name);
 }
 
-function processButtonClick(id, buttonName) {
+function processButtonClick(event, id, buttonName) {
+	event.preventDefault();
+
     if (capturedId != -1 && capturedId != id) return;
 
     const li = document.querySelector('[data-id="' + id + '"]');
@@ -187,10 +194,10 @@ function createButtonWithListener(
     name,
     btnOption,
     isEditMode = false,
-    type = "button"
+    type = "button",
 ) {
     const button = createButton(name, btnOption, type);
-    button.addEventListener("click", () => processButtonClick(id, name));
+    button.addEventListener("click", (e) => processButtonClick(e, id, name));
 
     if (isEditMode) button.classList.add("hide");
 
@@ -214,10 +221,10 @@ function createInput(text, isEditMode = false, inputOption = null) {
     return input;
 }
 
-function createElement() {
-    const element = document.createElement(arguments[0]);
+function createElement(type, ...args) {
+    const element = document.createElement(type);
 
-    for (argument of arguments) element.classList.add(argument);
+    for (argument of args) element.classList.add(argument);
 
     return element;
 }
