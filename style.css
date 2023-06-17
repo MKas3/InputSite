@@ -1,7 +1,7 @@
 body {
-    background-color: #222022;
+    background-color: #010307;
     text-align: center;
-    color: #ffffff;
+    color: #dde8f1;
     min-width: 30em;
 }
 
@@ -10,17 +10,19 @@ li {
 }
 
 li:hover {
-    color: #8a8a8a;
+    color: #74797e;
 }
 
 li label,
 li input {
-    background-color: #222022;
-    color: #ffffff;
+    background-color: #010307;
     width: 50%;
     line-height: 1.5em;
     word-wrap: break-word;
-    display: inline-block;
+}
+
+li input {
+    color: #74797e;
 }
 
 .ol-input {
@@ -30,12 +32,21 @@ li input {
     justify-content: center;
 }
 
+.form-check {
+    width: 50%;
+    margin: auto;
+}
+
+.form-check:hover {
+    color: #74797e;
+}
+
 .main-ol {
     margin-top: 5%;
 }
 
 .main-ol ol li::before {
-    content: attr(data-id)". ";
+    content: attr(data-id) ". ";
     display: inline;
 }
 
@@ -57,7 +68,4 @@ li input {
     display: none;
 }
 
-.form-check {
-    width: 50%;
-    margin: auto;
-}
+
