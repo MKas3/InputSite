@@ -53,6 +53,10 @@ li input {
     margin-right: 0.5em;
 }
 
+.hide {
+    display: none;
+}
+
 .form-check {
     width: 50%;
     margin: auto;

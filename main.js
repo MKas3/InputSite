@@ -77,12 +77,12 @@ function addLiToOl(text, id) {
     deleteButton.classList.add("del-button");
 
     const acceptButton = createButtonWithListener(
-        id, "OK", "btn-outline-success", "none");
+        id, "OK", "btn-outline-success", true);
 
     const cancelButton = createButtonWithListener(
-        id, "Cancel", "btn-outline-danger", "none");
+        id, "Cancel", "btn-outline-danger", true);
 
-    const renameInput = createInput(text);
+    const renameInput = createInput(text, true);
 
     newLi.appendChild(deleteButton);
     newLi.appendChild(editButton);
@@ -112,19 +112,13 @@ function processButtonClick(id, buttonName) {
     const editMode = li.classList.toggle("edit-mode");
     capturedId = editMode ? id : -1;
 
-    const nonEditDisplay = editMode ? "none" : "inline-block";
-    const editDisplay = editMode ? "inline-block" : "none";
-
     const label = li.querySelector("label");
     const input = li.querySelector("input");
-    label.style.display = nonEditDisplay;
-    input.style.display = editDisplay;
+    label.classList.toggle("hide");
+    input.classList.toggle("hide");
 
     for (const button of li.querySelectorAll("button")) {
-        button.style.display = 
-            button.classList.contains("edit-mode-button") 
-            ? editDisplay 
-            : nonEditDisplay;
+        button.classList.toggle("hide");
     };
 
     if (editMode) {
@@ -169,13 +163,12 @@ function updateList() {
     };
 };
 
-function createButtonWithListener(id, name, btnOption, display = "unset", type = "button") {
+function createButtonWithListener(id, name, btnOption, isEditMode = false, type = "button") {
     const button = createButton(name, btnOption, type);
     button.addEventListener("click", () => processButtonClick(id, name));
-    button.style.display = display;
 
-    if (display == "none")
-        button.classList.add("edit-mode-button");
+    if (isEditMode)
+        button.classList.add("hide");
 
     return button;
 };
@@ -188,10 +181,12 @@ function createButton(name, btnOption, type = "button") {
     return button;
 };
 
-function createInput(text, display = "none", inputOption = null) {
+function createInput(text, isEditMode = false, inputOption = null) {
     const input = createElement("input", inputOption);
     input.value = text;
-    input.style.display = display;
+
+    if (isEditMode)
+        input.classList.add("hide");
 
     return input;
 };
