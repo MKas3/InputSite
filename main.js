@@ -32,6 +32,7 @@ document.addEventListener("click", function(e) {
         innerOrderedList.splice(liIndex, 1);
         innerAlphOrderedList = innerAlphOrderedList.filter(x => x != li);
         li.remove();
+        id--;
     };
 });
 
