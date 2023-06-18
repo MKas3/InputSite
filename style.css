@@ -11,6 +11,7 @@ li {
 
 li:hover {
     color: #74797e;
+    transition: 0.15s;
 }
 
 li label,
@@ -39,6 +40,7 @@ li input {
 
 .form-check:hover {
     color: #74797e;
+    transition: 0.15s;
 }
 
 .main-ol {
@@ -46,8 +48,7 @@ li input {
 }
 
 .main-ol ol li::before {
-    content: attr(data-id) ". ";
-    display: inline;
+    content: attr(data-id)". ";
 }
 
 .main-ol ol {

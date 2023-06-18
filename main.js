@@ -23,7 +23,7 @@ for (let i = 0; i < radioButtons.length; i++)
 document.addEventListener("click", function (e) {
     const target = e.target.closest(".del-button");
     if (target) {
-        const li = target.closest("li");
+        const li = target.closest("form");
         deleteLiFromOl(li);
     }
 });
@@ -31,9 +31,9 @@ document.addEventListener("click", function (e) {
 function deleteLiFromOl(li) {
     const liIndex = innerOrderedList.indexOf(li);
     for (var i = liIndex; i < innerOrderedList.length; i++)
-        innerOrderedList[i].setAttribute(
+        innerOrderedList[i].firstChild.setAttribute(
             "data-id",
-            innerOrderedList[i].getAttribute("data-id") - 1
+            innerOrderedList[i].firstChild.getAttribute("data-id") - 1
         );
     innerOrderedList.splice(liIndex, 1);
     innerAlphOrderedList = innerAlphOrderedList.filter((x) => x != li);
