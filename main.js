@@ -4,158 +4,40 @@ let addButton = olInput.querySelector(".btn");
 
 let radioButtons = document.querySelectorAll(".form-check-input");
 
-let ol = document.querySelector(".main-ol ol");
+let ol = document.querySelector("ol");
 
-let innerOrderedList = [];
-let innerAlphOrderedList = [];
+const SortingTypes = {
+    AscendingNumbers: 0,
+    DescendingNumbers: 1,
+    AlphabeticalOrder: 2,
+    ReverseAlphabeticalOrder: 3,
+};
+
+let innerList = [];
 
 let tempText = "";
 
 let nextId = 1;
 let capturedId = -1;
-let sortingIndexNow = 0;
+let sortingIndexNow = SortingTypes.AscendingNumbers;
 
 olInput.addEventListener("submit", processSubmit);
 
-for (let i = 0; i < radioButtons.length; i++)
+for (let i = 0; i < radioButtons.length; i++) {
     radioButtons[i].addEventListener("click", () => processSortingChange(i));
-
-document.addEventListener("click", function (e) {
-    const target = e.target.closest(".del-button");
-    if (target) {
-        const li = target.closest("form");
-        deleteLiFromOl(li);
-    }
-});
-
-function deleteLiFromOl(li) {
-    const liIndex = innerOrderedList.indexOf(li);
-    for (var i = liIndex; i < innerOrderedList.length; i++)
-        innerOrderedList[i].firstChild.setAttribute(
-            "data-id",
-            innerOrderedList[i].firstChild.getAttribute("data-id") - 1
-        );
-    innerOrderedList.splice(liIndex, 1);
-    innerAlphOrderedList = innerAlphOrderedList.filter((x) => x != li);
-    li.remove();
-    nextId--;
 }
 
 function processSubmit(event) {
     event.preventDefault();
 
-    if (checkItemValidity(input.value)) {
-        pushToOrderedLists(addLiToOl(input.value, nextId));
+    if (checkNameValidity(input.value)) {
+        const liForm = createLiForm(input.value, nextId);
+        pushToList(liForm);
+
         input.value = "";
         nextId++;
     } else {
         alertInvalidName();
-    }
-}
-
-function pushToOrderedLists(li) {
-    innerOrderedList.push(li);
-
-    innerAlphOrderedList.push(li);
-    sortAlphList();
-
-    updateList();
-}
-
-function sortAlphList() {
-    innerAlphOrderedList.sort((a, b) => a.innerText.localeCompare(b.innerText));
-}
-
-function addLiToOl(text, id) {
-	const newForm = createElement("form");
-    const newLi = createElement("li");
-
-	newForm.appendChild(newLi);
-    ol.appendChild(newForm);
-
-    newLi.setAttribute("data-id", id);
-
-    const label = createElement("label");
-    newLi.appendChild(label);
-    label.innerText = text.trim();
-
-    const editButton = createButtonWithListener(
-        id,
-        "Edit",
-        "btn-outline-secondary"
-    );
-
-    const deleteButton = createButton("X", "btn-outline-danger");
-    deleteButton.classList.add("del-button");
-
-    const acceptButton = createButtonWithListener(
-        id,
-        "OK",
-        "btn-outline-success",
-        true,
-		"submit"
-    );
-
-    const cancelButton = createButtonWithListener(
-        id,
-        "Cancel",
-        "btn-outline-danger",
-        true
-    );
-	
-    const renameInput = createInput(text, true);
-	renameInput.addEventListener("submit", (event) => processButtonClick(event, id, "OK"));
-
-    newLi.appendChild(deleteButton);
-    newLi.appendChild(editButton);
-    newLi.appendChild(acceptButton);
-    newLi.appendChild(cancelButton);
-    newLi.appendChild(renameInput);
-
-    return newForm;
-}
-
-function alertInvalidName() {
-    alert(
-        "Please enter a valid item (non-empty and not consisting of only spaces)"
-    );
-}
-
-function checkItemValidity(name) {
-    const re = /[^ ]+/;
-    return re.test(name);
-}
-
-function processButtonClick(event, id, buttonName) {
-	event.preventDefault();
-
-    if (capturedId != -1 && capturedId != id) return;
-
-    const li = document.querySelector('[data-id="' + id + '"]');
-
-    const editMode = li.classList.toggle("edit-mode");
-    capturedId = editMode ? id : -1;
-
-    const label = li.querySelector("label");
-    const input = li.querySelector("input");
-    label.classList.toggle("hide");
-    input.classList.toggle("hide");
-
-    for (const button of li.querySelectorAll("button")) {
-        button.classList.toggle("hide");
-    }
-
-    if (editMode) {
-        tempText = label.innerText;
-    } else if (buttonName == "OK" && checkItemValidity(input.value)) {
-        label.innerText = input.value;
-        sortAlphList();
-        updateList();
-    } else {
-        input.value = tempText;
-        if (buttonName == "OK") {
-            alertInvalidName();
-        }
     }
 }
 
@@ -167,64 +49,162 @@ function processSortingChange(sortingIndex) {
     updateList();
 }
 
+function pushToList(li) {
+    innerList.push(li);
+
+    updateList();
+}
+
+function checkNameValidity(name) {
+    const re = /[^ ]+/;
+    return re.test(name);
+}
+
+function alertInvalidName() {
+    alert(
+        "Please enter a valid item (non-empty and not consisting of only spaces)"
+    );
+}
+
+function createLiForm(text, id) {
+    const trimText = text.trim();
+    const labelHTML = `<label class="hideable">${trimText}</label>`;
+    const inputHTML = `<input class="hideable hide" value="${trimText}">`;
+    const buttonsHTML =
+        "<button class='btn btn-outline-danger btn-sm hideable del-button' type='button'>X</button>" +
+        "<button class='btn btn-outline-secondary btn-sm hideable edit-button' type='button'>Edit</button>" +
+        "<button class='btn btn-outline-success btn-sm hideable accept-button hide' type='button'>OK</button>" +
+        "<button class='btn btn-outline-danger btn-sm hideable cancel-button hide' type='button'>Cancel</button>";
+
+    const liHTML = `<li data-id=${id}>${labelHTML}${buttonsHTML}${inputHTML}</li>`;
+
+    const newForm = document.createElement("form");
+    newForm.innerHTML = liHTML;
+
+    newForm.addEventListener("click", (e) => processLiClick(e));
+    newForm.addEventListener("submit", (e) => processLiClick(e, true));
+
+    return newForm;
+}
+
+function processLiClick(event, isSubmit = false) {
+    event.preventDefault();
+    const target = isSubmit
+        ? event.target.querySelector(".accept-button")
+        : event.target.closest(".btn");
+
+    if (target) processButtonClick(target);
+}
+
+function processButtonClick(button) {
+    const li = button.closest("li");
+    const id = li.getAttribute("data-id") - 1;
+
+    if (capturedId != -1 && capturedId != id) return;
+
+    if (button.classList.contains("del-button")) {
+        const liForm = li.closest("form");
+        deleteForm(liForm, id);
+    } else if (button.classList.contains("edit-button")) {
+        toggleEditMode(li, id);
+    } else if (button.classList.contains("accept-button")) {
+        acceptRenaming(li);
+    } else {
+        cancelRenaming(li);
+    }
+}
+
+function toggleEditMode(li, id) {
+    const isEditMode = li.classList.toggle("edit-mode");
+    capturedId = isEditMode ? id : -1;
+
+    for (const element of li.querySelectorAll(".hideable")) {
+        element.classList.toggle("hide");
+    }
+
+    const label = li.querySelector("label");
+    tempText = label.innerText;
+}
+
+function acceptRenaming(li) {
+    const label = li.querySelector("label");
+    const input = li.querySelector("input");
+
+    if (checkNameValidity(input.value)) {
+        label.innerText = input.value;
+        updateList();
+    } else {
+        input.value = tempText;
+        alertInvalidName();
+    }
+
+    toggleEditMode(li);
+}
+
+function cancelRenaming(li) {
+    const input = li.querySelector("input");
+
+    input.value = tempText;
+
+    toggleEditMode(li);
+}
+
+function deleteForm(form, id) {
+    const formIndex = innerList.indexOf(form);
+
+    for (var i = 0; i < innerList.length; i++) {
+        const dataId = innerList[i].firstChild.getAttribute("data-id");
+        if (dataId > id) {
+            innerList[i].firstChild.setAttribute("data-id", dataId - 1);
+        }
+    }
+
+    innerList.splice(formIndex, 1);
+    form.remove();
+    nextId--;
+}
+
 function updateList() {
-    const listToSort =
-        sortingIndexNow < 2 ? innerOrderedList : innerAlphOrderedList;
+    sortList();
+    renderList();
+}
+
+function sortList() {
+    if (innerList.length < 2) return;
 
     switch (sortingIndexNow) {
-        case 0:
-        case 2:
-            for (var i = listToSort.length - 1; i > 0; i--) {
-                ol.insertBefore(listToSort[i], listToSort[i + 1]);
-            }
+        case SortingTypes.AscendingNumbers:
+            innerList.sort(
+                (a, b) =>
+                    a.firstChild.getAttribute("data-id") -
+                    b.firstChild.getAttribute("data-id")
+            );
             break;
-        case 1:
-        case 3:
-            for (var i = 0; i < listToSort.length - 1; i++) {
-                ol.insertBefore(listToSort[i + 1], listToSort[i]);
-            }
+        case SortingTypes.DescendingNumbers:
+            innerList.sort(
+                (a, b) =>
+                    b.firstChild.getAttribute("data-id") -
+                    a.firstChild.getAttribute("data-id")
+            );
+            break;
+        case SortingTypes.AlphabeticalOrder:
+            innerList.sort((a, b) =>
+                a.textContent.localeCompare(b.textContent)
+            );
+            break;
+        case SortingTypes.ReverseAlphabeticalOrder:
+            innerList.sort((a, b) =>
+                b.textContent.localeCompare(a.textContent)
+            );
             break;
         default:
             break;
     }
 }
 
-function createButtonWithListener(
-    id,
-    name,
-    btnOption,
-    isEditMode = false,
-    type = "button",
-) {
-    const button = createButton(name, btnOption, type);
-    button.addEventListener("click", (e) => processButtonClick(e, id, name));
-
-    if (isEditMode) button.classList.add("hide");
-
-    return button;
-}
-
-function createButton(name, btnOption, type = "button") {
-    const button = createElement("button", "btn", btnOption, "btn-sm");
-    button.innerText = name;
-    button.setAttribute("type", type);
-
-    return button;
-}
-
-function createInput(text, isEditMode = false, inputOption = null) {
-    const input = createElement("input", inputOption);
-    input.value = text;
-
-    if (isEditMode) input.classList.add("hide");
-
-    return input;
-}
-
-function createElement(type, ...args) {
-    const element = document.createElement(type);
-
-    for (argument of args) element.classList.add(argument);
-
-    return element;
+function renderList() {
+    ol.innerHTML = "";
+    for (var i = 0; i < innerList.length; i++) {
+        ol.appendChild(innerList[i]);
+    }
 }
